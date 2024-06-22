@@ -4,14 +4,14 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
+const app = express();
+const port = process.env.PORT;
+const mongoUri = process.env.MONGODB_URI;
+
 app.use(cors({
     origin:true,
     credentials:true
 }));
-
-const app = express();
-const port = process.env.PORT;
-const mongoUri = process.env.MONGODB_URI;
 
 // MongoDB connection
 mongoose.connect(mongoUri);
