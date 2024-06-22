@@ -99,7 +99,7 @@ const scrapeAllNews = async () => {
 // Initial scraping when server starts
 scrapeAllNews();
 
-const scrapeInterval = 60 * 60 * 1000; // 10 minutes in milliseconds
+const scrapeInterval = 2 * 60 * 1000; // 10 minutes in milliseconds
 setInterval(() => {
     scrapeAllNews();
 }, scrapeInterval);
