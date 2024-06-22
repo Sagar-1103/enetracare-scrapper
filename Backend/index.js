@@ -1,17 +1,16 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 const mongoUri = process.env.MONGODB_URI;
 
-app.use(cors({
-    origin:true,
-    credentials:true
-}));
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // MongoDB connection
 mongoose.connect(mongoUri);
@@ -48,18 +47,21 @@ const newsSites = {
 // Helper function to scrape a news page
 const scrapeNews = async (siteName, siteConfig) => {
     const { url, selectors } = siteConfig;
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+        executablePath: process.env.CHROME_BIN || '/vercel/path/to/chrome',
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle2' });
 
     let articles = [];
 
     try {
-        const headlines = await page.$$eval(selectors.headline, (elements) => elements.map((el) => el.innerText));
-        const descriptions = await page.$$eval(selectors.description, (elements) => elements.map((el) => el.innerText));
-        const authors = await page.$$eval(selectors.author, (elements) => elements.map((el) => el.innerText));
-        const images = await page.$$eval(selectors.image, (elements) => elements.map((el) => el.getAttribute('src')));
-        const dates = await page.$$eval(selectors.date, (elements) => elements.map((el) => el.innerText));
+        const headlines = await page.$$eval(selectors.headline, elements => elements.map(el => el.innerText));
+        const descriptions = await page.$$eval(selectors.description, elements => elements.map(el => el.innerText));
+        const authors = await page.$$eval(selectors.author, elements => elements.map(el => el.innerText));
+        const images = await page.$$eval(selectors.image, elements => elements.map(el => el.getAttribute('src')));
+        const dates = await page.$$eval(selectors.date, elements => elements.map(el => el.innerText));
 
         await Article.deleteMany({ site: siteName });
 
@@ -99,21 +101,26 @@ const scrapeAllNews = async () => {
 // Initial scraping when server starts
 scrapeAllNews();
 
-const scrapeInterval = 2 * 60 * 1000; // 10 minutes in milliseconds
-setInterval(() => {
-    scrapeAllNews();
-}, scrapeInterval);
+const scrapeInterval = 60 * 60 * 1000; // 1 hour in milliseconds
+setInterval(scrapeAllNews, scrapeInterval);
 
-// Endpoint to check status (optional)
+// Endpoint to check status
 app.get('/', (req, res) => {
-    res.json({'status':'Server is running and scraping news periodically.'});
+    res.json({ status: 'Server is running and scraping news periodically.' });
 });
 
-app.get('/allnews', async(req, res) => {
-    const response = await Article.find({})
-    res.json(response);
+// Endpoint to fetch all news
+app.get('/allnews', async (req, res) => {
+    try {
+        const articles = await Article.find({});
+        res.json(articles);
+    } catch (error) {
+        console.error('Error fetching articles:', error);
+        res.status(500).json({ error: 'Failed to fetch articles.' });
+    }
 });
 
+// Start server
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
