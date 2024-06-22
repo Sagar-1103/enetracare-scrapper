@@ -1,7 +1,10 @@
 const express = require('express');
 const puppeteer = require('puppeteer');
 const mongoose = require('mongoose');
-require('dotenv').config()
+const cors = require('cors');
+require('dotenv').config();
+
+app.use(cors());
 
 const app = express();
 const port = process.env.PORT;
