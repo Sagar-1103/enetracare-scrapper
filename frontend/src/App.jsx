@@ -4,7 +4,7 @@ import useSWR from 'swr'
 const fetcher = (...args) => fetch(...args).then(res => res.json())
 
 function App() {
-    const { data, error, isLoading } = useSWR('https://enetracare-scrapper-backend.vercel.app/allnews', fetcher)
+    const { data, error, isLoading } = useSWR('https://enetracare-scrapper-server.vercel.app', fetcher)
 
     if (error) return <div>failed to load</div>
     if (isLoading) return <div className='text-5xl '>Loading...</div>
