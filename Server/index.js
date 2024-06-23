@@ -87,7 +87,7 @@ const scrapeNews = async () => {
 
 scrapeNews();
 
-const scrapeInterval = 120 * 60 * 1000; // 60 mins in milliseconds
+const scrapeInterval = 60 * 60 * 1000; // 60 mins in milliseconds
 setInterval(scrapeNews, scrapeInterval);
 
 app.get("/scrape", async (req, res) => {
@@ -101,7 +101,7 @@ app.get("/", async (req, res) => {
   if (allnews.length) {
     return res.status(200).json(allnews);
   }
-  return res.status(200).json({ Sorry: "There are no news at this moment" });
+  return res.status(200).json([]);
 });
 
 app.listen(PORT, () => {
