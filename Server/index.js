@@ -87,7 +87,7 @@ const scrapeNews = async () => {
 
 scrapeNews();
 
-const scrapeInterval = 2 * 60 * 1000; // 2 mins in milliseconds
+const scrapeInterval = 120 * 60 * 1000; // 60 mins in milliseconds
 setInterval(scrapeNews, scrapeInterval);
 
 app.get("/scrape", async (req, res) => {
