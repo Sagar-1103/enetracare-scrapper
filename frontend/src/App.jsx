@@ -13,7 +13,7 @@ function App() {
         <div className=" mx-[7%] px-4 py-8">
             <div className='text-5xl mb-10 text-center font-bold'>News Section</div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {data.length !== 0 &&
+                {data &&
                     data.map((article, index) => (
                         <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
                             <img src={article.image} alt={article.title} className="h-48 w-full object-cover" />
